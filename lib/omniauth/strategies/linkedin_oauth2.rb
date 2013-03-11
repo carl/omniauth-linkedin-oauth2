@@ -14,8 +14,11 @@ module OmniAuth
         :token_url => '/uas/oauth2/accessToken'
       }
 
-      option :scope, 'r_basicprofile r_emailaddress'
-      option :fields, ['id', 'email-address', 'first-name', 'last-name', 'headline', 'location', 'industry', 'picture-url', 'public-profile-url']
+      option :scope, 'r_fullprofile r_emailaddress'
+      option :fields, ['id', 'summary', 'specialties', 'email-address', 'first-name', 'last-name', 'headline',
+                       'location', 'industry', 'picture-url', 'skills', 'public-profile-url', 'educations', 'interests',
+                       'positions', 'num_connections', 'num_recommenders', 'member_url_resources'
+      ]
 
       # These are called after authentication has succeeded. If
       # possible, you should try to set the UID without making
@@ -41,7 +44,7 @@ module OmniAuth
       end
 
       extra do
-        { 'raw_info' => raw_info }
+        {'raw_info' => raw_info}
       end
 
       def raw_info
@@ -61,6 +64,43 @@ module OmniAuth
           :param_name => 'oauth2_access_token'
         })
       end
+
+      def request_phase
+        if signed_request_contains_access_token?
+          # if we already have an access token, we can just hit the
+          # callback URL directly and pass the signed request along
+          params = {:signed_request => raw_signed_request}
+          params[:state] = @state
+          query = Rack::Utils.build_query(params)
+
+          url = callback_url
+          url << "?" unless url.match(/\?/)
+          url << "&" unless url.match(/[\&\?]$/)
+          url << query
+
+          redirect url
+        else
+          super
+        end
+      end
+
+      def authorize_params
+        @state = SecureRandom.hex(15) #A unique long string that is not easy to guess
+        super.tap do |params|
+          # to support omniauth-oauth2's auto csrf protection
+          session['omniauth.state'] = params[:state] = @state
+        end
+      end
+
+      def signed_request_contains_access_token?
+        signed_request &&
+          signed_request['oauth_token']
+      end
+
+      def signed_request
+        @signed_request ||= request.params['signed_request']
+      end
+
     end
   end
 end
