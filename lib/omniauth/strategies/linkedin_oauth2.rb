@@ -17,7 +17,7 @@ module OmniAuth
       option :scope, 'r_fullprofile r_emailaddress'
       option :fields, ['id', 'summary', 'specialties', 'email-address', 'first-name', 'last-name', 'headline',
                        'location', 'industry', 'picture-url', 'skills', 'public-profile-url', 'educations', 'interests',
-                       'positions', 'num_connections', 'num_recommenders', 'member_url_resources'
+                       'positions', 'num_connections', 'num_recommenders', 'member_url_resources', 'picture-urls::(original)'
       ]
 
       # These are called after authentication has succeeded. If
@@ -28,18 +28,18 @@ module OmniAuth
       uid { raw_info['id'] }
 
       info do
-        {
+        val = {
           :name => user_name,
           :email => raw_info['emailAddress'],
           :nickname => user_name,
           :first_name => raw_info['firstName'],
           :last_name => raw_info['lastName'],
           :location => raw_info['location'],
-          :description => raw_info['headline'],
-          :image => raw_info['pictureUrl'],
-          :urls => {
-            'public_profile' => raw_info['publicProfileUrl']
-          }
+          :headline => raw_info['headline'],
+          :industry => raw_info['industry'],
+          :skills => raw_info['skills'],
+          :small_picture_url => raw_info['pictureUrl'],
+          :large_picture_url => raw_info['pictureUrls']
         }
       end
 
