@@ -15,48 +15,8 @@ module OmniAuth
       }
 
       option :scope, 'r_fullprofile r_emailaddress'
-      option :fields, ['id', 'summary', 'specialties', 'email-address', 'first-name', 'last-name', 'headline',
-                       'location', 'industry', 'picture-url', 'skills', 'public-profile-url', 'educations', 'interests',
-                       'positions', 'num_connections', 'num_recommenders', 'member_url_resources', 'picture-urls::(original)'
-      ]
-
-      # These are called after authentication has succeeded. If
-      # possible, you should try to set the UID without making
-      # additional calls (if the user id is returned with the token
-      # or as a URI parameter). This may not be possible with all
-      # providers.
-      uid { raw_info['id'] }
-
-      info do
-        val = {
-          :name => user_name,
-          :email => raw_info['emailAddress'],
-          :nickname => user_name,
-          :first_name => raw_info['firstName'],
-          :last_name => raw_info['lastName'],
-          :location => raw_info['location'],
-          :headline => raw_info['headline'],
-          :industry => raw_info['industry'],
-          :skills => raw_info['skills'],
-          :small_picture_url => raw_info['pictureUrl'],
-          :large_picture_url => raw_info['pictureUrls']
-        }
-      end
-
-      extra do
-        {'raw_info' => raw_info}
-      end
-
-      def raw_info
-        @raw_info ||= linkedin_access_token.get("/v1/people/~:(#{options.fields.join(',')})?format=json").parsed
-      end
 
       private
-
-      def user_name
-        name = "#{raw_info['firstName']} #{raw_info['lastName']}".strip
-        name.empty? ? nil : name
-      end
 
       def linkedin_access_token
         ::OAuth2::AccessToken.new(client, self.access_token.token, {
