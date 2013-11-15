@@ -10,7 +10,7 @@ module OmniAuth
       # initializing your consumer from the OAuth gem.
       option :client_options, {
         :site => "https://api.linkedin.com",
-        :authorize_url => 'https://www.linkedin.com/uas/oauth2/authorization?response_type=code',
+        :authorize_url => 'https://www.linkedin.com/uas/oauth2/authorization',
         :token_url => "https://www.linkedin.com/uas/oauth2/accessToken"
       }
 
