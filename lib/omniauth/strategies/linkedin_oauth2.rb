@@ -14,6 +14,10 @@ module OmniAuth
         :token_url => "https://www.linkedin.com/uas/oauth2/accessToken"
       }
 
+      option :token_params, {
+        :mode => :query
+      }
+
       option :scope, 'r_fullprofile r_emailaddress'
 
       private
